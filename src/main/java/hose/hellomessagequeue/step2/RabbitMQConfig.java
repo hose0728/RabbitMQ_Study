@@ -1,5 +1,6 @@
-package hose.hellomessagequeue.step0;
+package hose.hellomessagequeue.step2;
 
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -46,7 +47,7 @@ public class RabbitMQConfig {
      */
 
     // 큐 네임을 설정한다.
-    public static final String QUEUE_NAME = "helloQueue";
+    public static final String QUEUE_NAME = "WorkQueue";
 
     @Bean
     public Queue queue() {
@@ -63,11 +64,12 @@ public class RabbitMQConfig {
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(QUEUE_NAME);
         container.setMessageListener(listenerAdapter);
+        container.setAcknowledgeMode(AcknowledgeMode.AUTO);
         return container;
     }
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
+    public MessageListenerAdapter listenerAdapter(WorkQueueConsumer workQueueConsumer) {
+        return new MessageListenerAdapter(workQueueConsumer, "workQueueTask");
     }
 }
